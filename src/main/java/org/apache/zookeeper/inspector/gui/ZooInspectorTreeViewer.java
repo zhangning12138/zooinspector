@@ -300,6 +300,8 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
           expandedNodes.remove(path);
           zooInspectorManager.getCache().removePrefix(path);
           String parent = new File(path).getParent();
+          //fix: 在windows平台上 路径分隔符与zookeeper path分隔符不一致问题
+          parent = parent.replace("\\","/");
           System.out.println("parent: " + parent);
           try
           {

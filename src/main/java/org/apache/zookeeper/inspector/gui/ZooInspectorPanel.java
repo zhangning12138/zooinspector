@@ -142,142 +142,112 @@ public class ZooInspectorPanel extends JPanel implements
         refreshButton.setToolTipText("刷新");
         addNodeButton.setToolTipText("增加节点");
         deleteNodeButton.setToolTipText("删除节点");
-        connectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ZooInspectorConnectionPropertiesDialog zicpd = new ZooInspectorConnectionPropertiesDialog(
-                        zooInspectorManager.getLastConnectionProps(),
-                        zooInspectorManager.getConnectionPropertiesTemplate(),
-                        ZooInspectorPanel.this);
-                zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
-                zicpd.setVisible(true);
-            }
+        connectButton.addActionListener(e -> {
+            ZooInspectorConnectionPropertiesDialog zicpd = new ZooInspectorConnectionPropertiesDialog(
+                    zooInspectorManager.getLastConnectionProps(),
+                    zooInspectorManager.getConnectionPropertiesTemplate(),
+                    ZooInspectorPanel.this);
+            zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
+            zicpd.setVisible(true);
         });
-        disconnectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                disconnect();
-            }
-        });
-        refreshButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                treeViewer.refreshView();
-            }
-        });
-        addNodeButton.addActionListener(new ActionListener() {
-            String nodeName;
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                final List<String> selectedNodes = treeViewer
-                        .getSelectedNodes();
-                if (selectedNodes.size() == 1) {
-                    nodeName = JOptionPane.showInputDialog(
-                            ZooInspectorPanel.this,
-                            "请输入新节点名称",
-                            "创建节点", JOptionPane.INFORMATION_MESSAGE);
-                    if (nodeName != null && nodeName.length() > 0) {
-                        SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
-
-                            @Override
-                            protected Boolean doInBackground() throws Exception {
-                                return ZooInspectorPanel.this.zooInspectorManager
-                                        .createNode(selectedNodes.get(0),
-                                                nodeName);
-                            }
-
-                            @Override
-                            protected void done() {
-//                                treeViewer.refreshView();
-                              treeViewer.refreshViewAfterAdd(selectedNodes.get(0), nodeName);
-                            }
-                        };
-                        worker.execute();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                            "请为新增节点选择1个父节点");
-                }
-            }
-        });
-        deleteNodeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final List<String> selectedNodes = treeViewer
-                        .getSelectedNodes();
-                if (selectedNodes.size() == 0) {
-                    JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                            "无法删除,未选择节点");
-                } else {
-                    int answer = JOptionPane.showConfirmDialog(
-                            ZooInspectorPanel.this,
-                            "确认删除选中节点吗?(此操作不可恢复)",
-                            "确认删除", JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-                    if (answer == JOptionPane.YES_OPTION) {
-                        SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
-
-                            @Override
-                            protected Boolean doInBackground() throws Exception {
-                                for (String nodePath : selectedNodes) {
-                                    boolean result = ZooInspectorPanel.this.zooInspectorManager
-                                            .deleteNode(nodePath);
-                                    if (!result) {
-                                      return false;
-                                    }
-                                }
-                                return true;
-                            }
-
-                            @Override
-                            protected void done() {
-//                                treeViewer.refreshView();
-
-                              treeViewer.refreshViewAfterDelete(selectedNodes);
-                            }
-                        };
-                        worker.execute();
-                    }
-                }
-            }
-        });
-        nodeViewersButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ZooInspectorNodeViewersDialog nvd = new ZooInspectorNodeViewersDialog(
-                        JOptionPane.getRootFrame(), nodeViewers, listeners,
-                        zooInspectorManager);
-                nvd.setLocationRelativeTo(ZooInspectorPanel.this);
-                nvd.setVisible(true);
-            }
-        });
-        aboutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ZooInspectorAboutDialog zicpd = new ZooInspectorAboutDialog(
-                        JOptionPane.getRootFrame());
-                zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
-                zicpd.setVisible(true);
-            }
-        });
-
-        searchButton.addActionListener(new ActionListener() {
-            String nodeName;
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nodeName = JOptionPane.showInputDialog(
-                            ZooInspectorPanel.this,
-                            "输入需要查询的节点关键字",
-                            "查找接口服务节点", JOptionPane.INFORMATION_MESSAGE);
+        disconnectButton.addActionListener(e -> disconnect());
+        refreshButton.addActionListener(e -> treeViewer.refreshView());
+        addNodeButton.addActionListener(e -> {
+            final List<String> selectedNodes = treeViewer
+                    .getSelectedNodes();
+            if (selectedNodes.size() == 1) {
+                String nodeName = JOptionPane.showInputDialog(
+                        ZooInspectorPanel.this,
+                        "请输入新节点名称",
+                        "创建节点", JOptionPane.INFORMATION_MESSAGE);
                 if (nodeName != null && nodeName.length() > 0) {
-                    treeViewer.selectNodeByName(nodeName, ZooInspectorPanel.this);
+                    SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+
+                        @Override
+                        protected Boolean doInBackground() throws Exception {
+                            return ZooInspectorPanel.this.zooInspectorManager
+                                    .createNode(selectedNodes.get(0),
+                                            nodeName);
+                        }
+
+                        @Override
+                        protected void done() {
+//                                treeViewer.refreshView();
+                          treeViewer.refreshViewAfterAdd(selectedNodes.get(0), nodeName);
+                        }
+                    };
+                    worker.execute();
                 }
+            } else {
+                JOptionPane.showMessageDialog(ZooInspectorPanel.this,
+                        "请为新增节点选择1个父节点");
+            }
+        });
+        deleteNodeButton.addActionListener(e -> {
+            final List<String> selectedNodes = treeViewer
+                    .getSelectedNodes();
+            if (selectedNodes.size() == 0) {
+                JOptionPane.showMessageDialog(ZooInspectorPanel.this,
+                        "无法删除,未选择节点");
+            } else {
+                int answer = JOptionPane.showConfirmDialog(
+                        ZooInspectorPanel.this,
+                        "确认删除选中节点吗?(此操作不可恢复)",
+                        "确认删除", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if (answer == JOptionPane.YES_OPTION) {
+                    SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+
+                        @Override
+                        protected Boolean doInBackground() {
+                            for (String nodePath : selectedNodes) {
+                                boolean result = ZooInspectorPanel.this.zooInspectorManager
+                                        .deleteNode(nodePath);
+                                if (!result) {
+                                  return false;
+                                }
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        protected void done() {
+//                                treeViewer.refreshView();
+
+                          treeViewer.refreshViewAfterDelete(selectedNodes);
+                        }
+                    };
+                    worker.execute();
+                }
+            }
+        });
+        nodeViewersButton.addActionListener(e -> {
+            ZooInspectorNodeViewersDialog nvd = new ZooInspectorNodeViewersDialog(
+                    JOptionPane.getRootFrame(), nodeViewers, listeners,
+                    zooInspectorManager);
+            nvd.setLocationRelativeTo(ZooInspectorPanel.this);
+            nvd.setVisible(true);
+        });
+        aboutButton.addActionListener(e -> {
+            ZooInspectorAboutDialog zicpd = new ZooInspectorAboutDialog(
+                    JOptionPane.getRootFrame());
+            zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
+            zicpd.setVisible(true);
+        });
+
+        searchButton.addActionListener(e -> {
+            String nodeName = JOptionPane.showInputDialog(
+                        ZooInspectorPanel.this,
+                        "输入需要查询的节点关键字",
+                        "查找接口服务节点", JOptionPane.INFORMATION_MESSAGE);
+            if (nodeName != null && nodeName.length() > 0) {
+                treeViewer.selectNodeByName(nodeName, ZooInspectorPanel.this);
             }
         });
 
         JScrollPane treeScroller = new JScrollPane(treeViewer);
+        //加快节点树滚动速度
+        treeScroller.getVerticalScrollBar().setUnitIncrement(16);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 treeScroller, nodeViewersPanel);
         splitPane.setResizeWeight(0.25);
@@ -294,7 +264,7 @@ public class ZooInspectorPanel extends JPanel implements
         SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 
             @Override
-            protected Boolean doInBackground() throws Exception {
+            protected Boolean doInBackground() {
                 zooInspectorManager.setLastConnectionProps(connectionProps);
                 return zooInspectorManager.connect(connectionProps);
             }

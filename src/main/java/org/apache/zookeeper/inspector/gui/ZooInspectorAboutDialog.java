@@ -66,7 +66,7 @@ public class ZooInspectorAboutDialog extends JDialog {
                     "Error loading about.html, file may be corrupt", e);
         }
         panel.add(aboutPane, BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(600, 265));
+        panel.setPreferredSize(new Dimension(600, 275));
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton okButton = new JButton("OK");
