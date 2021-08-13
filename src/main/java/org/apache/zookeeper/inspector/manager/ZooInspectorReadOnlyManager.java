@@ -20,6 +20,7 @@ package org.apache.zookeeper.inspector.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper.States;
 
 /**

@@ -46,11 +46,11 @@ public class ZooInspector {
 //          Dimension screenSize = getScreenResolution();
 //          int screenWidth = screenSize.width;
 //          int screenHeight = screenSize.height;
-          // System.out.println("screenWidth: " + screenWidth + ", screenHeight: " + screenHeight);
+//           System.out.println("screenWidth: " + screenWidth + ", screenHeight: " + screenHeight);
 
 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            JFrame frame = new JFrame("ZooInspector");
+            JFrame frame = new JFrame("Zookeeper查看器(ZooInspector)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             // debug
@@ -68,8 +68,13 @@ public class ZooInspector {
             });
 
             frame.setContentPane(zooInspectorPanel);
-            frame.setSize(1024, 768);
+//            frame.setSize(1024, 768);
 //            frame.setSize(screenWidth * 2 / 3, screenHeight);
+//            frame.getGraphicsConfiguration().getDevice().setFullScreenWindow(frame);
+            Dimension screenSize = new Dimension(1024,768);
+            frame.setMinimumSize(screenSize);
+            frame.setLocationRelativeTo(null);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             frame.setVisible(true);
         } catch (Exception e) {
             LoggerFactory.getLogger().error(

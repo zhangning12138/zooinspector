@@ -18,7 +18,7 @@ public class NodeDataViewerFindDialog extends JDialog {
 
   public NodeDataViewerFindDialog(final NodeViewerData dataViewer) {
     this.setLayout(new BorderLayout());
-    this.setTitle("Find");
+    this.setTitle("查找文字");
     this.setModal(true);
     this.setAlwaysOnTop(true);
     this.setResizable(false);
@@ -29,7 +29,7 @@ public class NodeDataViewerFindDialog extends JDialog {
 
     int i = 0;
     int rowPos = 2 * i + 1;
-    JLabel label = new JLabel("Search for: ");
+    JLabel label = new JLabel("节点信息中查找: ");
     GridBagConstraints c1 = new GridBagConstraints();
     c1.gridx = 0;
     c1.gridy = rowPos;

@@ -141,6 +141,7 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
       public void keyPressed(KeyEvent e) {
         if ((e.getKeyCode() == KeyEvent.VK_F) && ((e.getModifiers() & (KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0)) {
           NodeDataViewerFindDialog dialog = new NodeDataViewerFindDialog(NodeViewerData.this);
+          dialog.setLocationRelativeTo(NodeViewerData.this);
           dialog.setVisible(true);
         } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
           highlighter.removeAllHighlights();
@@ -162,8 +163,8 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
       public void actionPerformed(ActionEvent e) {
         if (selectedNode != null) {
           if (JOptionPane.showConfirmDialog(NodeViewerData.this,
-              "Are you sure you want to save this node?" + " (this action cannot be reverted)",
-              "Confirm Save", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+              "确认保存该节点信息吗?" + " (此操作不可恢复)",
+              "确认保存", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
             zooInspectorManager.setData(selectedNode, dataArea.getText());
           }
         }
@@ -189,9 +190,9 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
     // add a search icon
     JButton searchButton = new JButton(ZooInspectorIconResources.getSearchIcon());
     String osName = System.getProperty("os.name").toLowerCase();
-    String tipText = "Find (^F)";
+    String tipText = "查找信息(Ctrl+F)";
     if (osName != null && osName.indexOf("mac") > -1) {
-      tipText = "Find (^/⌘F)";
+      tipText = "查找信息 (^/⌘F)";
     }
     searchButton.setToolTipText(tipText);
     searchButton.addActionListener(new ActionListener() {
@@ -199,6 +200,7 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
       public void actionPerformed(ActionEvent e) {
         // if (zooInspectorManager != null && zooInspectorManager.getZookeeperStates() == States.CONNECTED) {
           NodeDataViewerFindDialog dialog = new NodeDataViewerFindDialog(NodeViewerData.this);
+          dialog.setLocationRelativeTo(dataArea);
           dialog.setVisible(true);
         // }
       }
@@ -215,7 +217,7 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
    */
   @Override
   public String getTitle() {
-    return "Node Data";
+    return "节点信息";
   }
 
   /*
@@ -244,10 +246,10 @@ public class NodeViewerData extends ZooInspectorNodeViewer {
             data = get();
           } catch (InterruptedException e) {
             LoggerFactory.getLogger().error(
-                "Error retrieving data for node: " + NodeViewerData.this.selectedNode, e);
+                "检索节点的数据时出错：" + NodeViewerData.this.selectedNode, e);
           } catch (ExecutionException e) {
             LoggerFactory.getLogger().error(
-                "Error retrieving data for node: " + NodeViewerData.this.selectedNode, e);
+                "检索节点的数据时出错：" + NodeViewerData.this.selectedNode, e);
           }
           NodeViewerData.this.dataArea.setText(data);
           NodeViewerData.this.dataArea.setCaretPosition(0);

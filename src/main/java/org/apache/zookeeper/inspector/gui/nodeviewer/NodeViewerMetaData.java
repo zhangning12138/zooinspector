@@ -67,7 +67,7 @@ public class NodeViewerMetaData extends ZooInspectorNodeViewer {
      */
     @Override
     public String getTitle() {
-        return "Node Metadata";
+        return "节点元数据";
     }
 
     /*
@@ -100,13 +100,13 @@ public class NodeViewerMetaData extends ZooInspectorNodeViewer {
                     } catch (InterruptedException e) {
                         data = new HashMap<String, String>();
                         LoggerFactory.getLogger().error(
-                                "Error retrieving meta data for node: "
+                                "检索节点的元数据时出错："
                                         + selectedNode,
                                 e);
                     } catch (ExecutionException e) {
                         data = new HashMap<String, String>();
                         LoggerFactory.getLogger().error(
-                                "Error retrieving meta data for node: "
+                                "检索节点的元数据时出错："
                                         + selectedNode,
                                 e);
                     }

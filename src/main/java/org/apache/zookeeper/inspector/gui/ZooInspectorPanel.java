@@ -20,6 +20,8 @@ package org.apache.zookeeper.inspector.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 
 import org.apache.zookeeper.ZooKeeper.States;
+import org.apache.zookeeper.inspector.gui.nodeviewer.NodeViewerData;
 import org.apache.zookeeper.inspector.gui.nodeviewer.ZooInspectorNodeViewer;
 import org.apache.zookeeper.inspector.logger.LoggerFactory;
 import org.apache.zookeeper.inspector.manager.ZooInspectorManager;
@@ -54,6 +57,7 @@ public class ZooInspectorPanel extends JPanel implements
     private final JButton deleteNodeButton;
     private final JButton nodeViewersButton;
     private final JButton aboutButton;
+    private final JButton searchButton;
     private final List<NodeViewersChangeListener> listeners = new ArrayList<NodeViewersChangeListener>();
     {
         listeners.add(this);
@@ -91,15 +95,11 @@ public class ZooInspectorPanel extends JPanel implements
             }
         } catch (Exception ex) {
             LoggerFactory.getLogger().error(
-                    "Error loading default node viewers.", ex);
+                    "加载默认节点查看器时出错。", ex);
             JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                    "Error loading default node viewers: " + ex.getMessage(),
+                    "加载默认节点查看器时出错：" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
-        nodeViewersPanel = new ZooInspectorNodeViewersPanel(
-                zooInspectorManager, nodeViewers);
-        treeViewer = new ZooInspectorTreeViewer(ZooInspectorPanel.this, zooInspectorManager,
-                nodeViewersPanel);
         this.setLayout(new BorderLayout());
         JToolBar toolbar = new JToolBar();
         toolbar.setFloatable(false);
@@ -114,9 +114,15 @@ public class ZooInspectorPanel extends JPanel implements
                 .getChangeNodeViewersIcon());
         aboutButton = new JButton(ZooInspectorIconResources
                 .getInformationIcon());
+        searchButton = new JButton(ZooInspectorIconResources
+                .getSearchIcon());
+        nodeViewersPanel = new ZooInspectorNodeViewersPanel(
+                zooInspectorManager, nodeViewers);
+        treeViewer = new ZooInspectorTreeViewer(ZooInspectorPanel.this, zooInspectorManager, nodeViewersPanel, searchButton);
         toolbar.add(connectButton);
         toolbar.add(disconnectButton);
         toolbar.add(refreshButton);
+        toolbar.add(searchButton);
         toolbar.add(addNodeButton);
         toolbar.add(deleteNodeButton);
         toolbar.add(nodeViewersButton);
@@ -128,13 +134,14 @@ public class ZooInspectorPanel extends JPanel implements
         addNodeButton.setEnabled(false);
         deleteNodeButton.setEnabled(false);
         nodeViewersButton.setEnabled(true);
-        nodeViewersButton.setToolTipText("Change Node Viewers");
-        aboutButton.setToolTipText("About ZooInspector");
-        connectButton.setToolTipText("Connect");
-        disconnectButton.setToolTipText("Disconnect");
-        refreshButton.setToolTipText("Refresh");
-        addNodeButton.setToolTipText("Add Node");
-        deleteNodeButton.setToolTipText("Delete Node");
+        searchButton.setEnabled(false);
+        nodeViewersButton.setToolTipText("更改节点查看器");
+        aboutButton.setToolTipText("关于");
+        connectButton.setToolTipText("连接");
+        disconnectButton.setToolTipText("断开连接");
+        refreshButton.setToolTipText("刷新");
+        addNodeButton.setToolTipText("增加节点");
+        deleteNodeButton.setToolTipText("删除节点");
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -142,6 +149,7 @@ public class ZooInspectorPanel extends JPanel implements
                         zooInspectorManager.getLastConnectionProps(),
                         zooInspectorManager.getConnectionPropertiesTemplate(),
                         ZooInspectorPanel.this);
+                zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
                 zicpd.setVisible(true);
             }
         });
@@ -167,8 +175,8 @@ public class ZooInspectorPanel extends JPanel implements
                 if (selectedNodes.size() == 1) {
                     nodeName = JOptionPane.showInputDialog(
                             ZooInspectorPanel.this,
-                            "Please Enter a name for the new node",
-                            "Create Node", JOptionPane.INFORMATION_MESSAGE);
+                            "请输入新节点名称",
+                            "创建节点", JOptionPane.INFORMATION_MESSAGE);
                     if (nodeName != null && nodeName.length() > 0) {
                         SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 
@@ -189,7 +197,7 @@ public class ZooInspectorPanel extends JPanel implements
                     }
                 } else {
                     JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                            "Please select 1 parent node for the new node.");
+                            "请为新增节点选择1个父节点");
                 }
             }
         });
@@ -200,13 +208,12 @@ public class ZooInspectorPanel extends JPanel implements
                         .getSelectedNodes();
                 if (selectedNodes.size() == 0) {
                     JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                            "Please select at least 1 node to be deleted");
+                            "无法删除,未选择节点");
                 } else {
                     int answer = JOptionPane.showConfirmDialog(
                             ZooInspectorPanel.this,
-                            "Are you sure you want to delete the selected nodes?"
-                                    + "(This action cannot be reverted)",
-                            "Confirm Delete", JOptionPane.YES_NO_OPTION,
+                            "确认删除选中节点吗?(此操作不可恢复)",
+                            "确认删除", JOptionPane.YES_NO_OPTION,
                             JOptionPane.WARNING_MESSAGE);
                     if (answer == JOptionPane.YES_OPTION) {
                         SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
@@ -242,6 +249,7 @@ public class ZooInspectorPanel extends JPanel implements
                 ZooInspectorNodeViewersDialog nvd = new ZooInspectorNodeViewersDialog(
                         JOptionPane.getRootFrame(), nodeViewers, listeners,
                         zooInspectorManager);
+                nvd.setLocationRelativeTo(ZooInspectorPanel.this);
                 nvd.setVisible(true);
             }
         });
@@ -250,9 +258,25 @@ public class ZooInspectorPanel extends JPanel implements
             public void actionPerformed(ActionEvent e) {
                 ZooInspectorAboutDialog zicpd = new ZooInspectorAboutDialog(
                         JOptionPane.getRootFrame());
+                zicpd.setLocationRelativeTo(ZooInspectorPanel.this);
                 zicpd.setVisible(true);
             }
         });
+
+        searchButton.addActionListener(new ActionListener() {
+            String nodeName;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nodeName = JOptionPane.showInputDialog(
+                            ZooInspectorPanel.this,
+                            "输入需要查询的节点关键字",
+                            "查找接口服务节点", JOptionPane.INFORMATION_MESSAGE);
+                if (nodeName != null && nodeName.length() > 0) {
+                    treeViewer.selectNodeByName(nodeName, ZooInspectorPanel.this);
+                }
+            }
+        });
+
         JScrollPane treeScroller = new JScrollPane(treeViewer);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 treeScroller, nodeViewersPanel);
@@ -286,30 +310,31 @@ public class ZooInspectorPanel extends JPanel implements
                         refreshButton.setEnabled(true);
                         addNodeButton.setEnabled(true);
                         deleteNodeButton.setEnabled(true);
+                        searchButton.setEnabled(true);
 
                         // save successful connect string in default properties
                         zooInspectorManager.updateDefaultConnectionFile(connectionProps);
                     } else {
                         JOptionPane.showMessageDialog(ZooInspectorPanel.this,
-                                "Unable to connect to zookeeper", "Error",
+                                "无法连接到zookeeper", "错误",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (InterruptedException e) {
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "Error occurred while connecting to ZooKeeper server",
+                                    "连接到ZooKeeper服务器时出错",
                                     e);
                 } catch (ExecutionException e) {
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "Error occurred while connecting to ZooKeeper server",
+                                    "连接到ZooKeeper服务器时出错",
                                     e);
                 } catch (IOException e) {
                     LoggerFactory
                       .getLogger()
-                      .error("Error occurred while update default connections", e);
+                      .error("更新默认连接时出错", e);
                 }
             }
 
@@ -347,18 +372,19 @@ public class ZooInspectorPanel extends JPanel implements
                         refreshButton.setEnabled(false);
                         addNodeButton.setEnabled(false);
                         deleteNodeButton.setEnabled(false);
+                        searchButton.setEnabled(false);
                     }
                 } catch (InterruptedException e) {
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "Error occurred while disconnecting from ZooKeeper server",
+                                    "从ZooKeeper服务器断开连接时出错",
                                     e);
                 } catch (ExecutionException e) {
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "Error occurred while disconnecting from ZooKeeper server",
+                                    "从ZooKeeper服务器断开连接时出错",
                                     e);
                 }
             }
@@ -373,7 +399,7 @@ public class ZooInspectorPanel extends JPanel implements
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "Error occurred while disconnecting from ZooKeeper server",
+                                    "从ZooKeeper服务器断开连接时出错",
                                     e);
                 }
             }

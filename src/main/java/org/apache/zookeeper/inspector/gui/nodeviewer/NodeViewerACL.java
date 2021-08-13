@@ -65,7 +65,7 @@ public class NodeViewerACL extends ZooInspectorNodeViewer {
      */
     @Override
     public String getTitle() {
-        return "Node ACLs";
+        return "节点权限";
     }
 
     /*

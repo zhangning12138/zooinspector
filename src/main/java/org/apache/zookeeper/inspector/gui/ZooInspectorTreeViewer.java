@@ -17,12 +17,8 @@
  */
 package org.apache.zookeeper.inspector.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,11 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
@@ -66,6 +58,7 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
     private final ZooInspectorManager zooInspectorManager;
     private final JTree tree;
     private final Toaster toasterManager;
+    private final JButton searchButton;
 
     /**
      * HACK:
@@ -85,9 +78,10 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
     public ZooInspectorTreeViewer(
             final ZooInspectorPanel zooInspectorPanel,
             final ZooInspectorManager zooInspectorManager,
-            TreeSelectionListener listener) {
+            TreeSelectionListener listener,final JButton searchButton) {
         this.zooInspectorPanel = zooInspectorPanel;
         this.zooInspectorManager = zooInspectorManager;
+        this.searchButton = searchButton;
         this.setLayout(new BorderLayout());
         final JPopupMenu popupMenu = new JPopupMenu();
         final JMenuItem addNotify = new JMenuItem("Add Change Notification");
@@ -114,7 +108,6 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
                 zooInspectorManager.removeWatchers(selectedNodes);
             }
         });
-
         tree = new JTree(new DefaultMutableTreeNode());
         System.out.println("init jtree: " + tree);
 
@@ -134,6 +127,33 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
                     popupMenu.show(ZooInspectorTreeViewer.this, e.getX(), e
                             .getY());
                 }
+            }
+        });
+        tree.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                String nodeName;
+                if ((e.getKeyCode() == KeyEvent.VK_F) && ((e.getModifiers() & (KeyEvent.CTRL_MASK | KeyEvent.META_MASK)) != 0)) {//ctrl+f
+                    if (searchButton.isEnabled()) {
+                        nodeName = JOptionPane.showInputDialog(zooInspectorPanel, "输入需要查询的节点关键字", "查找接口服务节点", JOptionPane.INFORMATION_MESSAGE);
+                        if (nodeName != null && nodeName.length() > 0) {
+                            ZooInspectorTreeViewer.this.selectNodeByName(nodeName, zooInspectorPanel);
+                        }
+                    }
+                }
+//                else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {//ESC
+//
+//                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
             }
         });
 
@@ -331,6 +351,33 @@ public class ZooInspectorTreeViewer extends JPanel implements NodeListener,
      */
     public void clearView() {
         tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
+    }
+
+    public void selectNodeByName(String nodeName, Component parentComponent) {
+        TreePath[] treePaths = searchNode(nodeName);
+        if (treePaths.length > 0) {
+            tree.setSelectionPaths(treePaths);
+            tree.scrollPathToVisible(treePaths[0]);
+        } else {
+            JOptionPane.showMessageDialog(parentComponent, "未查询到结果,请展开节点后再查询");
+        }
+    }
+
+    /**
+     * 根据字符串返回对应节点
+     *
+     * @param nodeStr
+     * @return
+     */
+    private TreePath[] searchNode(String nodeStr) {
+        List<TreePath> treePathList = new ArrayList<>();
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            TreePath treePath = tree.getPathForRow(i);
+            if (treePath != null && treePath.toString().toLowerCase().contains(nodeStr.toLowerCase())) {
+                treePathList.add(treePath);
+            }
+        }
+        return treePathList.toArray(new TreePath[0]);
     }
 
     /**

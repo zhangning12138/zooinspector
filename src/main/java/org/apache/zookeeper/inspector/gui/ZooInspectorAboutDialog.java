@@ -46,7 +46,7 @@ public class ZooInspectorAboutDialog extends JDialog {
         this.setLayout(new BorderLayout());
         this.setIconImage(ZooInspectorIconResources.getInformationIcon()
                 .getImage());
-        this.setTitle("About ZooInspector");
+        this.setTitle("关于ZooInspector");
         this.setModal(true);
         this.setAlwaysOnTop(true);
         this.setResizable(false);
@@ -66,7 +66,7 @@ public class ZooInspectorAboutDialog extends JDialog {
                     "Error loading about.html, file may be corrupt", e);
         }
         panel.add(aboutPane, BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(600, 200));
+        panel.setPreferredSize(new Dimension(600, 265));
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton okButton = new JButton("OK");

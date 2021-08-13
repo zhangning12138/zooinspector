@@ -65,22 +65,22 @@ import org.apache.zookeeper.retry.ZooKeeperRetry;
  */
 public class ZooInspectorManagerImpl implements ZooInspectorManager
 {
-  private static final String A_VERSION = "ACL Version";
-  private static final String C_TIME = "Creation Time";
-  private static final String C_VERSION = "Children Version";
-  private static final String CZXID = "Creation ID";
-  private static final String DATA_LENGTH = "Data Length";
-  private static final String EPHEMERAL_OWNER = "Ephemeral Owner";
-  private static final String M_TIME = "Last Modified Time";
-  private static final String MZXID = "Modified ID";
-  private static final String NUM_CHILDREN = "Number of Children";
-  private static final String PZXID = "Node ID";
-  private static final String VERSION = "Data Version";
-  private static final String ACL_PERMS = "Permissions";
-  private static final String ACL_SCHEME = "Scheme";
-  private static final String ACL_ID = "Id";
-  private static final String SESSION_STATE = "Session State";
-  private static final String SESSION_ID = "Session ID";
+  private static final String A_VERSION = "权限版本";
+  private static final String C_TIME = "创建时间";
+  private static final String C_VERSION = "子节点版本";
+  private static final String CZXID = "创建ID";
+  private static final String DATA_LENGTH = "数据长度";
+  private static final String EPHEMERAL_OWNER = "临时所有人";
+  private static final String M_TIME = "最后修改时间";
+  private static final String MZXID = "修改ID";
+  private static final String NUM_CHILDREN = "子节点数量";
+  private static final String PZXID = "节点ID";
+  private static final String VERSION = "数据版本";
+  private static final String ACL_PERMS = "权限";
+  private static final String ACL_SCHEME = "方案";
+  private static final String ACL_ID = "ID";
+  private static final String SESSION_STATE = "会话状态";
+  private static final String SESSION_ID = "会话ID";
   /**
    * The key used for the connect string in the connection properties file
    */
@@ -831,9 +831,9 @@ public class ZooInspectorManagerImpl implements ZooInspectorManager
     template.put(DATA_ENCRYPTION_MANAGER,
                  Arrays.asList(new String[] { defaultEncryptionManager }));
     Map<String, String> labels = new LinkedHashMap<String, String>();
-    labels.put(CONNECT_STRING, "Connect String");
-    labels.put(SESSION_TIMEOUT, "Session Timeout");
-    labels.put(DATA_ENCRYPTION_MANAGER, "Data Encryption Manager");
+    labels.put(CONNECT_STRING, "Zookeeper地址");
+    labels.put(SESSION_TIMEOUT, "会话超时时间");
+    labels.put(DATA_ENCRYPTION_MANAGER, "数据加密管理器");
     return new Pair<Map<String, List<String>>, Map<String, String>>(template, labels);
   }
 

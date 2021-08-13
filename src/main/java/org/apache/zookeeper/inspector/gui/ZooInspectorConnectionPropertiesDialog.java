@@ -74,7 +74,7 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
         final Map<String, String> connectionPropertiesLabels = connectionPropertiesTemplateAndLabels
                 .getValue();
         this.setLayout(new BorderLayout());
-        this.setTitle("Connection Settings");
+        this.setTitle("连接到zookeeper");
         this.setModal(true);
         this.setAlwaysOnTop(true);
         this.setResizable(false);
@@ -84,8 +84,8 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
         int i = 0;
 
         // move buttons declaration in front so we can call them for ENTER/ESC key events
-        final JButton okButton = new JButton("OK");
-        final JButton cancelButton = new JButton("Cancel");
+        final JButton okButton = new JButton("连接");
+        final JButton cancelButton = new JButton("取消");
 
         components = new HashMap<String, JComponent>();
         for (Entry<String, List<String>> entry : connectionPropertiesTemplate
@@ -207,7 +207,7 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
         loadConnectionProps(lastConnectionProps);
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new GridBagLayout());
-        JButton loadPropsFileButton = new JButton("Load from file");
+        JButton loadPropsFileButton = new JButton("加载配置文件");
         loadPropsFileButton.addActionListener(new ActionListener() {
 
             @Override
@@ -229,13 +229,13 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
                         LoggerFactory
                                 .getLogger()
                                 .error(
-                                        "An Error occurred loading connection properties from file",
+                                        "从文件加载连接属性时出错",
                                         ex);
                         JOptionPane
                                 .showMessageDialog(
                                         ZooInspectorConnectionPropertiesDialog.this,
-                                        "An Error occurred loading connection properties from file",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+                                        "从文件加载连接属性时出错",
+                                        "错误", JOptionPane.ERROR_MESSAGE);
                     }
                     options.revalidate();
                     options.repaint();
@@ -256,7 +256,7 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
         c3.ipadx = 0;
         c3.ipady = 0;
         buttonsPanel.add(loadPropsFileButton, c3);
-        JButton saveDefaultPropsFileButton = new JButton("Set As Default");
+        JButton saveDefaultPropsFileButton = new JButton("保存为默认连接");
         saveDefaultPropsFileButton.addActionListener(new ActionListener() {
 
             @Override
@@ -270,13 +270,13 @@ public class ZooInspectorConnectionPropertiesDialog extends JDialog {
                     LoggerFactory
                             .getLogger()
                             .error(
-                                    "An Error occurred saving the default connection properties file",
+                                    "保存默认连接属性文件时出错",
                                     ex);
                     JOptionPane
                             .showMessageDialog(
                                     ZooInspectorConnectionPropertiesDialog.this,
-                                    "An Error occurred saving the default connection properties file",
-                                    "Error", JOptionPane.ERROR_MESSAGE);
+                                    "保存默认连接属性文件时出错",
+                                    "错误", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
